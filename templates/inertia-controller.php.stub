@@ -1,0 +1,112 @@
+<?php
+namespace App\Http\Controllers;
+use App\Helpers\FileUploadHelper;
+{{#if sameUpdateCreateRequestFile}}
+use App\Http\Requests\CreateUpdate{{pascalCase modelName}}Request;
+{{else}}
+{{/if}}
+use App\Models\CarOwner;
+use Illuminate\Support\Facades\Schema;
+
+
+class {{pascalCase modelName}}InertiaController extends Controller
+{
+
+	private $directory_name = '{{pascalCase pluralModelName}}';
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        if (request()->wantsJson()) {
+            return $this->get{{pascalCase modelName}}List();
+        }
+        return Inertia("{{pascalCase pluralModelName}}/index", []);
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store({{#if sameUpdateCreateRequestFile}}CreateUpdate{{else}}Create{{/if}}{{pascalCase modelName}}Request $request)
+    {
+        $data = $request->validated();
+
+        {{#each createForm}}
+        {{#ifEquals this.type 'file'}}
+        if($request->hasFile('uploaded_{{this.name}}'))
+	        $data['{{this.name}}'] = FileUploadHelper::upload_file($request->file('uploaded_{{this.name}}'), $this->directory_name);
+        {{/ifEquals}}
+        {{/each}}
+        
+        ${{modelNameCamelCase}} = {{modelName}}::create($data);
+        return redirect()->route('{{pluralModelName}}.index');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show({{modelName}} ${{modelName}})
+    {
+        if (request()->wantsJson()) {
+            return ${{modelName}};
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit({{modelName}} ${{modelNameCamelCase}})
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+  
+    public function update({{#if sameUpdateCreateRequestFile}}CreateUpdate{{else}}Update{{/if}}{{modelName}}Request $request, {{modelName}} ${{modelName}})
+    {
+        $data = $request->validated();
+        {{#each updateForm}}
+        {{#ifEquals this.type 'file'}}
+        if($request->hasFile('uploaded_{{this.name}}'))
+	        $data['{{this.name}}'] = FileUploadHelper::upload_file($request->file('uploaded_{{this.name}}'), $this->directory_name);
+        {{/ifEquals}}
+        {{/each}}
+        
+       
+        $updated_{{modelNameCamelCase}} = ${{modelName}}->update($data);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy({{modelName}} ${{modelName}})
+    {
+        ${{modelName}}->delete();
+    }
+
+    private function get{{modelName}}List()
+    {
+        $columns = Schema::getColumnListing('{{pluralize modelNameSnakeCase}}');
+        $query = {{modelName}}::query();
+
+        if (request('sort_by_key'))
+            $query->orderBy(request('sort_by_key'), request('sort_by_order') ?? "asc");
+
+        foreach ($columns as $column) {
+            if ($column == 'created_at' || $column == 'updated_at' || $column == 'id') continue;
+            $query->orWhere($column, 'LIKE', '%' . request('search') . '%');
+        }
+
+        return $query->paginate(request('per_page') >= 0 ? request('per_page') : {{modelName}}::count());
+    }
+}

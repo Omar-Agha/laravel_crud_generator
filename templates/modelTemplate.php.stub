@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class {{modelName}} extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        {{#each props}}
+        '{{this.name}}',
+        {{/each}}
+    ];
+
+
+   
+    protected $appends = [
+        {{#each props}}
+        {{#ifEquals this.type  "file"}}
+        '{{this.name}}_url',
+		{{/ifEquals}}
+        {{/each}}
+    ];
+
+
+    protected function casts(): array
+    {
+        return [
+        {{#each props}}
+        {{#ifEquals this.type  "date"}}
+        	'{{this.name}}' => 'datetime',
+		{{/ifEquals}}
+        {{/each}}
+        ];
+    }
+
+		{{#each props}}
+        {{#ifEquals this.type  "file"}}
+    protected function get{{pascalCase this.name}}UrlAttribute(){
+    	return asset($this->{{this.name}});
+    }
+    
+		{{/ifEquals}}
+        {{/each}}
+    
+}
