@@ -15,6 +15,7 @@
             	{{#ifEquals this.type 'string'}}<VTextField {{/ifEquals}}
             	{{#ifEquals this.type 'date'}}<VDateInput {{/ifEquals}}
 				{{#ifEquals this.type 'file'}}<VFileInput {{/ifEquals}}
+				{{#ifEquals this.type 'int'}}<VNumberInput {{/ifEquals}}
                 	v-model="recordForm.{{#ifEquals this.type 'file'}}uploaded_{{/ifEquals}}{{this.name}}" :label="translate('{{pascalCase this.name}}')"
                     :error-messages="appPage.props.errors.{{#ifEquals this.type 'file'}}uploaded_{{/ifEquals}}{{this.name}} || v$.{{#ifEquals this.type 'file'}}uploaded_{{/ifEquals}}{{this.name}}.$errors.map(e => e.$message)" />
 			{{/each}}
@@ -52,6 +53,7 @@ import PageLoader from '@/Components/PageLoader.vue';
 import { computed } from 'vue';
 import { translate } from '@/utils/translation';
 import { VDateInput } from 'vuetify/lib/labs/components.mjs';
+import { VNumberInput } from 'vuetify/labs/VNumberInput';
 
 const goo = ref();
 

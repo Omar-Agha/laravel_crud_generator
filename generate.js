@@ -8,7 +8,17 @@ import { registerHandlebarsHelpers } from './HandlebarsExtension.js';
 
 
 registerHandlebarsHelpers();
-
+/**
+ * settings.modelName is the model name in database 
+ * settings.modelNameSnakeCase is modelName but in snake case 
+ * settings.modelNameCamelCase is modelName but in camel case
+ * settings.sameUpdateCreateRequestFile a flag that state if there will be Create Form and Update Form or just one (CreateUpdateForm) 
+ * settings.props the model props,each prop contains (name, type:string|date|file|int)
+ * settings.createRules what are rules for creating new record, if sameUpdateCreateRequestFile was true then create Rule will be same for update rule
+ * settings.updateRules what are rules for updating a record , if sameUpdateCreateRequestFile was true this will be ignored
+ * settings.createForm will be auto generated based on createRules
+ * updateForm will be auto generate based on updateRules
+ */
 
 const settings = {
   modelName: "Example",
@@ -18,17 +28,17 @@ const settings = {
 
   props: [
     { name: "name", type: PropType.string.description, isRequired: true },
-    { name: "father_name", type: PropType.string.description },
-    { name: "mother_name", type: PropType.string.description, isRequired: true },
-    { name: "birth_date", type: PropType.date.description },
-    { name: "avatar", type: PropType.file.description, isRequired: true },
     { name: "description", type: PropType.string.description },
+    { name: "min_amount", type: PropType.int.description, isRequired: true },
+    { name: "max_amount", type: PropType.int.description },
+    { name: "avatar", type: PropType.file.description, isRequired: true },
+
   ],
   createRules: [
     { name: "name", rule: ["required"] },
-    { name: "father_name", rule: ["nullable"] },
-    { name: "mother_name", rule: ["required"] },
-    { name: "birth_date", rule: ["nullable", "date"] },
+    { name: "description", rule: ["nullable"] },
+    { name: "min_amount", rule: ["required", "integer"] },
+    { name: "max_amount", rule: ["required", "integer"] },
     { name: "avatar", rule: ["file", "required"], isUploadedFile: true },
 
   ],
